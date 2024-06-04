@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  LambdaFramework:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: LambdaFramework
+      Description: Safe retry and stop framework
+      ContentUri: lib
+      RetentionPolicy: Retain
+      CompatibleRuntimes:
+        - python3.9
+        - python3.10
+Outputs:
+    LambdaFramework:
+        Value: !Ref LambdaFramework
+        Export:
+            Name: Layer-LambdaFramework

@@ -1,0 +1,3 @@
+awslambdaric
+jsonschema
+jsonpath-ng

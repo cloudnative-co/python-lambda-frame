@@ -1,0 +1,26 @@
+#!/bin/sh
+. ./parameter.cfg
+
+rm -rf lib/python
+mkdir -p lib/python
+cp -r LambdaFramework lib/python
+pip install -r requirements.txt -t ./lib/python
+
+sam build
+cd .aws-sam/build
+aws cloudformation package \
+    --region $REGION \
+    --template-file template.yaml \
+    --s3-prefix $PROJECT_NAME \
+    --s3-bucket $S3_BUCKET \
+    --output-template-file packaged.yaml
+aws cloudformation deploy \
+    --stack-name $PROJECT_NAME \
+    --template-file packaged.yaml \
+    --region $REGION \
+    --capabilities CAPABILITY_NAMED_IAM  \
+    --s3-bucket $S3_BUCKET \
+    --s3-prefix $PROJECT_NAME \
+    --parameter-overrides \
+        ProjectName=$PROJECT_NAME \
+        RolePath=$ROLE_PATH \
