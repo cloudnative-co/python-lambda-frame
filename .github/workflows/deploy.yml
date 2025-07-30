@@ -1,0 +1,79 @@
+name: Deploy to AWS CloudFormation
+
+on:
+  push:
+    branches:
+      - main
+      - deploy
+
+env:
+  AWS_REGION: ap-northeast-1
+  PROJECT_NAME: LambdaFramework
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    # ブランチに基づいてデプロイ設定を決定
+    strategy:
+      matrix:
+        branch: [main, deploy]
+      include:
+        - branch: main
+          stack_name: lambda-framework-prod
+          s3_bucket: cn-seba-aws-sam-cli-managed-default-samclisourcebucket
+          environment: production
+          aws_role_arn: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws_region: ap-northeast-1
+        - branch: deploy
+          stack_name: lambda-framework-dev
+          s3_bucket: cn-seba-aws-sam-cli-managed-default-samclisourcebucket
+          environment: development
+          aws_role_arn: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws_region: ap-northeast-1
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Validate SAM template
+      run: |
+        sam validate
+        
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ matrix.aws_role_arn }}
+        aws-region: ${{ matrix.aws_region }}
+        
+    - name: Deploy with SAM
+      run: |
+        sam build
+        sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
+          --stack-name ${{ matrix.stack_name }} \
+          --s3-bucket ${{ matrix.s3_bucket }} \
+          --parameter-overrides ProjectName=${{ env.PROJECT_NAME }} Environment=${{ matrix.environment }}
+      env:
+        SAM_CLI_TELEMETRY: 0
+        
+    - name: Deploy status
+      if: always()
+      run: |
+        echo "Deployment completed for branch: ${{ github.ref }}"
+        echo "Stack name: ${{ matrix.stack_name }}"
+        echo "Environment: ${{ matrix.environment }}"
+        echo "Commit: ${{ github.sha }}" 

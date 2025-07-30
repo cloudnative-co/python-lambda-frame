@@ -1,0 +1,8 @@
+{
+    "cfn-lint.executablePath": "cfn-lint",
+    "cfn-lint.enable": true,
+    "yaml.validate": true,
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/aws/aws-sam-cli/master/samcli/local/schema/schema.json": "template.yaml"
+    }
+} 

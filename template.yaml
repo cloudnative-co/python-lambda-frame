@@ -1,18 +1,32 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Environment:
+    Type: String
+    Default: development
+    AllowedValues:
+      - development
+      - production
+    Description: Environment name
+
 Resources:
   LambdaFramework:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: LambdaFramework
-      Description: Safe retry and stop framework
-      ContentUri: lib
+      LayerName: !Sub "${PROJECT_NAME}-${Environment}"
+      Description: !Sub "Safe retry and stop framework - ${Environment}"
+      ContentUri: LambdaFramework
       RetentionPolicy: Retain
       CompatibleRuntimes:
         - python3.9
         - python3.10
+
 Outputs:
-    LambdaFramework:
-        Value: !Ref LambdaFramework
-        Export:
-            Name: Layer-LambdaFramework
+  LambdaFramework:
+    Value: !Ref LambdaFramework
+    Export:
+      Name: !Sub "Layer-${PROJECT_NAME}-${Environment}"
+  Environment:
+    Value: !Ref Environment
+    Description: Deployed environment
