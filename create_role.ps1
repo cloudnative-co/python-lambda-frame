@@ -1212,10 +1212,11 @@ if ($GITHUB_CLI_AVAILABLE) {
             Write-Info "IAMロール名: $ROLE_NAME"
             
             # PowerShellの文字列展開を確実にする
-            $AWS_ROLE_ARN = "arn:aws:iam:$($AWS_ACCOUNT_ID):role/$($ROLE_NAME)"
+            $AWS_ROLE_ARN = "arn:aws:iam::$($AWS_ACCOUNT_ID):role/$($ROLE_NAME)"
             Write-Info "生成されるARN: $AWS_ROLE_ARN"
             Write-Info "$SECRET_NAMEをRepository Secretsに登録中: $AWS_ROLE_ARN"
-            $result = gh secret set $SECRET_NAME --body $AWS_ROLE_ARN 2>&1
+            $result = gh variable set $SECRET_NAME --body $AWS_ROLE_ARN 2>&1
+            $result = gh secret set $SECRET_NAME --body $AWS_ROLE_ARN 2>&1        
             if ($LASTEXITCODE -eq 0) {
                 Write-Success "$SECRET_NAME がRepository Secretsに登録されました"
             } else {
@@ -1284,7 +1285,7 @@ Write-Host "AWSアカウントID: $AWS_ACCOUNT_ID"
 Write-Host "GitHubユーザー名: $GITHUB_USERNAME"
 Write-Host "GitHubリポジトリ名: $GITHUB_REPO_NAME"
 Write-Host "IAMロール名: $ROLE_NAME"
-Write-Host "IAMロールARN: arn:aws:iam:$($AWS_ACCOUNT_ID):role/$($ROLE_NAME)"
+Write-Host "IAMロールARN: arn:aws:iam::$($AWS_ACCOUNT_ID):role/$($ROLE_NAME)"
 Write-Host ""
 
 if ($GITHUB_CLI_AVAILABLE) {
@@ -1302,7 +1303,7 @@ if ($GITHUB_CLI_AVAILABLE) {
     Write-Host ""
     Write-Host "Repository Secrets:" -ForegroundColor Cyan
     Write-Host "Name: $SECRET_NAME"
-    Write-Host "Value: arn:aws:iam:$($AWS_ACCOUNT_ID):role/$($ROLE_NAME)"
+    Write-Host "Value: arn:aws:iam::$($AWS_ACCOUNT_ID):role/$($ROLE_NAME)"
     Write-Host "Name: S3_BUCKET"
     Write-Host "Value: $S3_BUCKET"
     Write-Host ""
