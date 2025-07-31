@@ -917,6 +917,12 @@ if (-not $GITHUB_CLI_WORKING) {
 # 6. AWSアカウントIDの取得
 Write-Info "AWSアカウントIDの取得中..."
 $AWS_ACCOUNT_ID = aws sts get-caller-identity --query Account --output text 2>$null
+if (-not $AWS_ACCOUNT_ID -or $AWS_ACCOUNT_ID -eq "None") {
+    Write-Error "AWSアカウントIDの取得に失敗しました"
+    Write-Info "AWS認証情報を確認してください"
+    aws sts get-caller-identity
+    exit 1
+}
 Write-Success "AWSアカウントID: $AWS_ACCOUNT_ID"
 
 # AWSリージョンの確認

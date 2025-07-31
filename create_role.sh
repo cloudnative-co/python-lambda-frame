@@ -941,6 +941,12 @@ fi
 # 6. AWSアカウントIDの取得
 print_info "AWSアカウントIDの取得中..."
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+if [ -z "$AWS_ACCOUNT_ID" ] || [ "$AWS_ACCOUNT_ID" = "None" ]; then
+    print_error "AWSアカウントIDの取得に失敗しました"
+    print_info "AWS認証情報を確認してください"
+    aws sts get-caller-identity
+    exit 1
+fi
 print_success "AWSアカウントID: $AWS_ACCOUNT_ID"
 
 # AWSリージョンの確認
@@ -1148,10 +1154,14 @@ if [ "$GITHUB_CLI_AVAILABLE" = true ]; then
         
         # 環境別AWS_ROLE_ARNの登録
         AWS_ROLE_ARN="arn:aws:iam::$AWS_ACCOUNT_ID:role/$ROLE_NAME"
+        print_info "登録するARN: $AWS_ROLE_ARN"
         if gh secret set "$SECRET_NAME" --body "$AWS_ROLE_ARN" &> /dev/null; then
             print_success "$SECRET_NAMEがRepository Secretsに登録されました"
         else
             print_warning "$SECRET_NAMEの登録に失敗しました"
+            print_info "手動でGitHub Secretsに設定してください:"
+            print_info "Name: $SECRET_NAME"
+            print_info "Value: $AWS_ROLE_ARN"
         fi
     
     # S3_BUCKETの登録
