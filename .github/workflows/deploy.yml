@@ -59,13 +59,12 @@ jobs:
         
     - name: Deploy with SAM
       run: |
+        STACK_NAME="LambdaFramework"
         # ブランチに基づいて環境設定を決定
         if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-          STACK_NAME="lambda-framework-prod"
           ENVIRONMENT="production"
           S3_BUCKET="${{ vars.S3_BUCKET_PROD }}"
         else
-          STACK_NAME="lambda-framework-dev"
           ENVIRONMENT="development"
           S3_BUCKET="${{ vars.S3_BUCKET_DEV }}"
         fi
