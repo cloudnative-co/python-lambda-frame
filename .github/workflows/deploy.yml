@@ -39,8 +39,8 @@ jobs:
         echo "Using role ARN: ${{ github.ref == 'refs/heads/main' && secrets.AWS_ROLE_ARN_PROD || secrets.AWS_ROLE_ARN_DEV }}"
         echo "AWS_ROLE_ARN_DEV exists: ${{ secrets.AWS_ROLE_ARN_DEV != '' }}"
         echo "AWS_ROLE_ARN_PROD exists: ${{ secrets.AWS_ROLE_ARN_PROD != '' }}"
-        echo "AWS_ROLE_ARN_DEV length: ${{ secrets.AWS_ROLE_ARN_DEV != '' && length(secrets.AWS_ROLE_ARN_DEV) || 0 }}"
-        echo "AWS_ROLE_ARN_PROD length: ${{ secrets.AWS_ROLE_ARN_PROD != '' && length(secrets.AWS_ROLE_ARN_PROD) || 0 }}"
+        echo "AWS_ROLE_ARN_DEV length: ${{ secrets.AWS_ROLE_ARN_DEV != '' && 'non-empty' || 'empty' }}"
+        echo "AWS_ROLE_ARN_PROD length: ${{ secrets.AWS_ROLE_ARN_PROD != '' && 'non-empty' || 'empty' }}"
         
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
