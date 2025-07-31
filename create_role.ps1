@@ -1051,8 +1051,13 @@ $TRUST_POLICY = @"
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
                 "StringEquals": {
-                    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-                    "token.actions.githubusercontent.com:sub": "repo:$GITHUB_USERNAME/$GITHUB_REPO_NAME:ref:refs/heads/deploy"
+                    "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+                },
+                "StringLike": {
+                    "token.actions.githubusercontent.com:sub": [
+                        "repo:$GITHUB_USERNAME/$GITHUB_REPO_NAME:ref:refs/heads/main",
+                        "repo:$GITHUB_USERNAME/$GITHUB_REPO_NAME:ref:refs/heads/deploy"
+                    ]
                 }
             }
         }
