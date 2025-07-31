@@ -34,3 +34,4 @@ This project includes automated CI/CD pipeline with:
 ## Updated: 2025-07-31
 
 Latest deployment test with OIDC and multi-environment setup.
+Fixed IAM role ARN configuration for production environment.
