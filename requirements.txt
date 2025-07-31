@@ -1,4 +1,4 @@
 awslambdaric
-py-rpds
+rpds-py
 jsonschema
 jsonpath-ng
