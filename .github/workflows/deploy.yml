@@ -38,6 +38,13 @@ jobs:
         role-to-assume: ${{ github.ref == 'refs/heads/main' && secrets.AWS_ROLE_ARN_PROD || secrets.AWS_ROLE_ARN_DEV }}
         aws-region: ${{ env.AWS_REGION }}
         
+    - name: Debug AWS Role ARN
+      run: |
+        echo "Current branch: ${{ github.ref }}"
+        echo "Using role ARN: ${{ github.ref == 'refs/heads/main' && secrets.AWS_ROLE_ARN_PROD || secrets.AWS_ROLE_ARN_DEV }}"
+        echo "AWS_ROLE_ARN_DEV exists: ${{ secrets.AWS_ROLE_ARN_DEV != '' }}"
+        echo "AWS_ROLE_ARN_PROD exists: ${{ secrets.AWS_ROLE_ARN_PROD != '' }}"
+        
     - name: Validate SAM template
       run: |
         # AWS認証情報の確認
