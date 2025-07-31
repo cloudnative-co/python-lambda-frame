@@ -1251,6 +1251,23 @@ if ($GITHUB_CLI_AVAILABLE) {
             } else {
                 Write-Warning "PROJECT_NAME の登録に失敗しました: $result"
             }
+            
+            # 環境別S3バケットの登録
+            Write-Info "S3_BUCKET_DEVをRepository Variablesに登録中: $S3_BUCKET"
+            $result = gh variable set S3_BUCKET_DEV --body $S3_BUCKET 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                Write-Success "S3_BUCKET_DEV がRepository Variablesに登録されました"
+            } else {
+                Write-Warning "S3_BUCKET_DEV の登録に失敗しました: $result"
+            }
+            
+            Write-Info "S3_BUCKET_PRODをRepository Variablesに登録中: $S3_BUCKET"
+            $result = gh variable set S3_BUCKET_PROD --body $S3_BUCKET 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                Write-Success "S3_BUCKET_PROD がRepository Variablesに登録されました"
+            } else {
+                Write-Warning "S3_BUCKET_PROD の登録に失敗しました: $result"
+            }
         } else {
             Write-Info "GitHub Secretsの自動登録をスキップしました"
         }
@@ -1278,6 +1295,8 @@ if ($GITHUB_CLI_AVAILABLE) {
     Write-Host "登録されたRepository Variables:" -ForegroundColor Yellow
     Write-Host "- AWS_REGION"
     Write-Host "- PROJECT_NAME"
+    Write-Host "- S3_BUCKET_DEV"
+    Write-Host "- S3_BUCKET_PROD"
 } else {
     Write-Host "手動でGitHubに以下を設定してください:" -ForegroundColor Yellow
     Write-Host ""
@@ -1292,4 +1311,8 @@ if ($GITHUB_CLI_AVAILABLE) {
     Write-Host "Value: $AWS_REGION"
     Write-Host "Name: PROJECT_NAME"
     Write-Host "Value: $PROJECT_NAME"
+    Write-Host "Name: S3_BUCKET_DEV"
+    Write-Host "Value: $S3_BUCKET"
+    Write-Host "Name: S3_BUCKET_PROD"
+    Write-Host "Value: $S3_BUCKET"
 } 

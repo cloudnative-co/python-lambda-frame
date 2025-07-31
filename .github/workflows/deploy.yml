@@ -53,19 +53,22 @@ jobs:
         if [ "${{ github.ref }}" = "refs/heads/main" ]; then
           STACK_NAME="lambda-framework-prod"
           ENVIRONMENT="production"
+          S3_BUCKET="${{ vars.S3_BUCKET_PROD }}"
         else
           STACK_NAME="lambda-framework-dev"
           ENVIRONMENT="development"
+          S3_BUCKET="${{ vars.S3_BUCKET_DEV }}"
         fi
         
         echo "Deploying to environment: $ENVIRONMENT"
         echo "Stack name: $STACK_NAME"
         echo "AWS Region: $AWS_REGION"
+        echo "S3 Bucket: $S3_BUCKET"
         
         sam build
         sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
           --stack-name $STACK_NAME \
-          --s3-bucket cn-seba-aws-sam-cli-managed-default-samclisourcebucket \
+          --s3-bucket $S3_BUCKET \
           --parameter-overrides ProjectName=${{ env.PROJECT_NAME }} Environment=$ENVIRONMENT
       env:
         AWS_REGION: ${{ env.AWS_REGION }}

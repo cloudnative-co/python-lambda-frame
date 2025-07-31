@@ -1192,6 +1192,19 @@ if [ "$GITHUB_CLI_AVAILABLE" = true ]; then
     else
         print_warning "PROJECT_NAMEの登録に失敗しました"
     fi
+    
+    # 環境別S3バケットの登録
+    if gh variable set S3_BUCKET_DEV --body "$S3_BUCKET" &> /dev/null; then
+        print_success "S3_BUCKET_DEVがRepository Variablesに登録されました"
+    else
+        print_warning "S3_BUCKET_DEVの登録に失敗しました"
+    fi
+    
+    if gh variable set S3_BUCKET_PROD --body "$S3_BUCKET" &> /dev/null; then
+        print_success "S3_BUCKET_PRODがRepository Variablesに登録されました"
+    else
+        print_warning "S3_BUCKET_PRODの登録に失敗しました"
+    fi
     else
         print_info "GitHub Secretsの自動登録をスキップしました"
     fi
@@ -1218,6 +1231,8 @@ if [ "$GITHUB_CLI_AVAILABLE" = true ]; then
     echo "登録されたRepository Variables:"
     echo "- AWS_REGION"
     echo "- PROJECT_NAME"
+    echo "- S3_BUCKET_DEV"
+    echo "- S3_BUCKET_PROD"
 else
     echo "手動でGitHubに以下を設定してください:"
     echo ""
@@ -1232,4 +1247,8 @@ else
     echo "Value: $AWS_REGION"
     echo "Name: PROJECT_NAME"
     echo "Value: $PROJECT_NAME"
+    echo "Name: S3_BUCKET_DEV"
+    echo "Value: $S3_BUCKET"
+    echo "Name: S3_BUCKET_PROD"
+    echo "Value: $S3_BUCKET"
 fi 
