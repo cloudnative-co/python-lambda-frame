@@ -1,4 +1,4 @@
-name: Deploy to AWS CloudFormation
+name: Deploy to AWS CloudFormation (Amazon Linux 2)
 
 on:
   push:
@@ -15,54 +15,53 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        
-    - name: Install dependencies for Amazon Linux 2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Amazon Linux 2 compatible package
       run: |
-        python -m pip install --upgrade pip
-        # Amazon Linux 2用のバイナリをダウンロード
-        pip install --platform manylinux2014_x86_64 --only-binary=all --target ./package -r requirements.txt
-        # ネイティブバイナリが必要な場合は、Amazon Linux 2コンテナでビルド
+        # Amazon Linux 2コンテナで依存関係をビルド
         docker run --rm -v $(pwd):/var/task public.ecr.aws/lambda/python:3.10 \
-          pip install -r requirements.txt -t /var/task/package
-        # パッケージサイズを確認
-        du -sh ./package
-        ls -la ./package
+          bash -c "
+            cd /var/task
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt -t ./package
+            echo 'Dependencies installed for Amazon Linux 2'
+            ls -la ./package
+            du -sh ./package
+          "
         
-    - name: Create deployment package
+    - name: Create optimized deployment package
       run: |
         # パッケージディレクトリを作成
-        mkdir -p deployment-package
+        mkdir -p lambda-package
+        
         # Lambda関数のコードをコピー
-        cp -r LambdaFramework/* deployment-package/
-        # 依存関係をコピー
-        cp -r package/* deployment-package/
+        cp -r LambdaFramework/* lambda-package/
+        
+        # Amazon Linux 2用の依存関係をコピー
+        cp -r package/* lambda-package/
+        
+        # 不要なファイルを削除（サイズ最適化）
+        find lambda-package -name "*.pyc" -delete
+        find lambda-package -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+        find lambda-package -name "*.dist-info" -type d -exec rm -rf {} + 2>/dev/null || true
+        
         # パッケージを圧縮
-        cd deployment-package
+        cd lambda-package
         zip -r ../lambda-deployment-package.zip .
         cd ..
-        echo "Deployment package created: lambda-deployment-package.zip"
-        ls -la lambda-deployment-package.zip
         
-    - name: Debug AWS Role ARN
-      run: |
-        echo "Current branch: ${{ github.ref }}"
-        echo "Branch condition: ${{ github.ref == 'refs/heads/main' }}"
-        echo "Using role ARN: ${{ github.ref == 'refs/heads/main' && secrets.AWS_ROLE_ARN_PROD || secrets.AWS_ROLE_ARN_DEV }}"
-        echo "AWS_ROLE_ARN_DEV exists: ${{ secrets.AWS_ROLE_ARN_DEV != '' }}"
-        echo "AWS_ROLE_ARN_PROD exists: ${{ secrets.AWS_ROLE_ARN_PROD != '' }}"
-        echo "AWS_ROLE_ARN_DEV length: ${{ secrets.AWS_ROLE_ARN_DEV != '' && 'non-empty' || 'empty' }}"
-        echo "AWS_ROLE_ARN_PROD length: ${{ secrets.AWS_ROLE_ARN_PROD != '' && 'non-empty' || 'empty' }}"
+        echo "Optimized deployment package created"
+        ls -la lambda-deployment-package.zip
+        du -sh lambda-deployment-package.zip
         
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -70,14 +69,20 @@ jobs:
         role-to-assume: ${{ github.ref == 'refs/heads/main' && secrets.AWS_ROLE_ARN_PROD || secrets.AWS_ROLE_ARN_DEV }}
         aws-region: ${{ env.AWS_REGION }}
         
-    - name: Validate SAM template
+    - name: Upload package to S3
       run: |
-        # AWS認証情報の確認
-        aws sts get-caller-identity
-        echo "AWS Region: $AWS_REGION"
-        sam validate
-      env:
-        AWS_REGION: ${{ env.AWS_REGION }}
+        # ブランチに基づいて環境設定を決定
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          S3_BUCKET="${{ vars.S3_BUCKET_PROD }}"
+          ENVIRONMENT="production"
+        else
+          S3_BUCKET="${{ vars.S3_BUCKET_DEV }}"
+          ENVIRONMENT="development"
+        fi
+        
+        # S3にパッケージをアップロード
+        aws s3 cp lambda-deployment-package.zip s3://$S3_BUCKET/lambda-packages/
+        echo "Package uploaded to s3://$S3_BUCKET/lambda-packages/"
         
     - name: Deploy with SAM
       run: |
@@ -118,7 +123,7 @@ jobs:
           ENVIRONMENT="development"
         fi
         
-        echo "Deployment completed for branch: ${{ github.ref }}"
+        echo "Amazon Linux 2 deployment completed for branch: ${{ github.ref }}"
         echo "Stack name: $STACK_NAME"
         echo "Environment: $ENVIRONMENT"
         echo "Commit: ${{ github.sha }}" 
