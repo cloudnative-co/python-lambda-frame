@@ -1256,16 +1256,19 @@ if ($GITHUB_CLI_AVAILABLE) {
             }
             
             # 環境別S3バケットの登録
-            Write-Info "S3_BUCKET_DEVをRepository Variablesに登録中: $S3_BUCKET"
-            $result = gh variable set S3_BUCKET_DEV --body $S3_BUCKET 2>&1
+            $S3_BUCKET_DEV = "$S3_BUCKET-dev"
+            $S3_BUCKET_PROD = "$S3_BUCKET-prod"
+            
+            Write-Info "S3_BUCKET_DEVをRepository Variablesに登録中: $S3_BUCKET_DEV"
+            $result = gh variable set S3_BUCKET_DEV --body $S3_BUCKET_DEV 2>&1
             if ($LASTEXITCODE -eq 0) {
                 Write-Success "S3_BUCKET_DEV がRepository Variablesに登録されました"
             } else {
                 Write-Warning "S3_BUCKET_DEV の登録に失敗しました: $result"
             }
             
-            Write-Info "S3_BUCKET_PRODをRepository Variablesに登録中: $S3_BUCKET"
-            $result = gh variable set S3_BUCKET_PROD --body $S3_BUCKET 2>&1
+            Write-Info "S3_BUCKET_PRODをRepository Variablesに登録中: $S3_BUCKET_PROD"
+            $result = gh variable set S3_BUCKET_PROD --body $S3_BUCKET_PROD 2>&1
             if ($LASTEXITCODE -eq 0) {
                 Write-Success "S3_BUCKET_PROD がRepository Variablesに登録されました"
             } else {
@@ -1315,7 +1318,7 @@ if ($GITHUB_CLI_AVAILABLE) {
     Write-Host "Name: PROJECT_NAME"
     Write-Host "Value: $PROJECT_NAME"
     Write-Host "Name: S3_BUCKET_DEV"
-    Write-Host "Value: $S3_BUCKET"
+    Write-Host "Value: $S3_BUCKET_DEV"
     Write-Host "Name: S3_BUCKET_PROD"
-    Write-Host "Value: $S3_BUCKET"
+    Write-Host "Value: $S3_BUCKET_PROD"
 } 

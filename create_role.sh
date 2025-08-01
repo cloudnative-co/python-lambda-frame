@@ -1196,13 +1196,16 @@ if [ "$GITHUB_CLI_AVAILABLE" = true ]; then
     fi
     
     # 環境別S3バケットの登録
-    if gh variable set S3_BUCKET_DEV --body "$S3_BUCKET" &> /dev/null; then
+    S3_BUCKET_DEV="$S3_BUCKET-dev"
+    S3_BUCKET_PROD="$S3_BUCKET-prod"
+    
+    if gh variable set S3_BUCKET_DEV --body "$S3_BUCKET_DEV" &> /dev/null; then
         print_success "S3_BUCKET_DEVがRepository Variablesに登録されました"
     else
         print_warning "S3_BUCKET_DEVの登録に失敗しました"
     fi
     
-    if gh variable set S3_BUCKET_PROD --body "$S3_BUCKET" &> /dev/null; then
+    if gh variable set S3_BUCKET_PROD --body "$S3_BUCKET_PROD" &> /dev/null; then
         print_success "S3_BUCKET_PRODがRepository Variablesに登録されました"
     else
         print_warning "S3_BUCKET_PRODの登録に失敗しました"
@@ -1250,7 +1253,7 @@ else
     echo "Name: PROJECT_NAME"
     echo "Value: $PROJECT_NAME"
     echo "Name: S3_BUCKET_DEV"
-    echo "Value: $S3_BUCKET"
+    echo "Value: $S3_BUCKET_DEV"
     echo "Name: S3_BUCKET_PROD"
-    echo "Value: $S3_BUCKET"
+    echo "Value: $S3_BUCKET_PROD"
 fi 
