@@ -30,14 +30,16 @@ jobs:
     - name: Install dependencies for Amazon Linux 2
       run: |
         python -m pip install --upgrade pip
-        # Amazon Linux 2用のバイナリをダウンロード
-        pip install --platform manylinux2014_x86_64 --only-binary=all --target ./package -r requirements.txt
-        # ネイティブバイナリが必要な場合は、Amazon Linux 2コンテナでビルド
+        # Amazon Linux 2コンテナで依存関係をビルド
         docker run --rm -v $(pwd):/var/task public.ecr.aws/lambda/python:3.10 \
-          pip install -r requirements.txt -t /var/task/package
-        # パッケージサイズを確認
-        du -sh ./package
-        ls -la ./package
+          bash -c "
+            cd /var/task
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt -t ./package
+            echo 'Dependencies installed for Amazon Linux 2'
+            ls -la ./package
+            du -sh ./package
+          "
         
     - name: Create deployment package
       run: |
