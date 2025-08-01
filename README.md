@@ -37,3 +37,4 @@ Latest deployment test with OIDC and multi-environment setup.
 Fixed IAM role ARN configuration for production environment.
 Fixed IAM role ARN format with double colon (::) for correct AWS format.# GitHub Actions Test
 # Test GitHub Actions OIDC Fix
+# Test S3 permissions fix
