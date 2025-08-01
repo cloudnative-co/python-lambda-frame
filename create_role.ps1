@@ -1054,10 +1054,7 @@ $TRUST_POLICY = @"
                     "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
                 },
                 "StringLike": {
-                    "token.actions.githubusercontent.com:sub": [
-                        "repo:$GITHUB_USERNAME/$GITHUB_REPO_NAME:ref:refs/heads/main",
-                        "repo:$GITHUB_USERNAME/$GITHUB_REPO_NAME:ref:refs/heads/deploy"
-                    ]
+                    "token.actions.githubusercontent.com:sub": "repo:$GITHUB_USERNAME/$GITHUB_REPO_NAME:*"
                 }
             }
         }
@@ -1111,34 +1108,15 @@ $POLICY_DOCUMENT = @"
             "Effect": "Allow",
             "Action": [
                 "cloudformation:*",
+                "s3:*",
                 "lambda:*",
                 "iam:*",
-                "logs:*"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:DeleteObject",
-                "s3:ListBucket",
-                "s3:GetBucketLocation",
-                "s3:GetObjectVersion",
-                "s3:PutObjectAcl"
-            ],
-            "Resource": [
-                "arn:aws:s3:::cn-seba-aws-sam-cli-managed-default-samclisourcebucket",
-                "arn:aws:s3:::cn-seba-aws-sam-cli-managed-default-samclisourcebucket/*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:CreateBucket",
-                "s3:DeleteBucket",
-                "s3:ListAllMyBuckets"
+                "logs:*",
+                "apigateway:*",
+                "events:*",
+                "sqs:*",
+                "sns:*",
+                "kms:*"
             ],
             "Resource": "*"
         }
