@@ -33,7 +33,7 @@ jobs:
         mkdir -p package
         # manylinux2014_x86_64プラットフォームでバイナリをダウンロード
         python -m pip install --upgrade pip
-        python -m pip install --platform manylinux2014_x86_64 --only-binary=all --target ./package -r requirements.txt
+        python -m pip install --platform manylinux2014_x86_64 --only-binary=:all: --no-deps --target ./package -r requirements.txt
         echo "Dependencies installed for Amazon Linux 2 compatibility"
         echo "Package directory contents:"
         ls -la package/
