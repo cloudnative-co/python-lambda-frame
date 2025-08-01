@@ -29,7 +29,7 @@ jobs:
       run: |
         # Amazon Linux 2コンテナで依存関係をビルド
         docker run --rm -v $(pwd):/var/task public.ecr.aws/lambda/python:3.10 \
-          bash -c "
+          /bin/bash -c "
             cd /var/task
             python -m pip install --upgrade pip
             pip install -r requirements.txt -t ./package
