@@ -31,19 +31,10 @@ jobs:
       run: |
         # パッケージディレクトリを作成
         mkdir -p package
-        # Amazon Linux 2コンテナで依存関係をビルド
-        docker run --rm -v $(pwd):/var/task amazonlinux:2 \
-          bash -c "
-            cd /var/task
-            yum update -y
-            yum install -y python3 python3-pip
-            python3 -m pip install --upgrade pip
-            python3 -m pip install -r requirements.txt -t ./package
-            echo 'Dependencies installed for Amazon Linux 2'
-            ls -la ./package
-            du -sh ./package
-          "
-        # パッケージディレクトリの存在を確認
+        # manylinux2014_x86_64プラットフォームでバイナリをダウンロード
+        python -m pip install --upgrade pip
+        python -m pip install --platform manylinux2014_x86_64 --only-binary=all --target ./package -r requirements.txt
+        echo "Dependencies installed for Amazon Linux 2 compatibility"
         echo "Package directory contents:"
         ls -la package/
         du -sh package/
