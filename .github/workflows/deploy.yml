@@ -30,6 +30,8 @@ jobs:
     - name: Build Amazon Linux 2 compatible package
       run: |
         python -m pip install --upgrade pip
+        # パッケージディレクトリを作成
+        mkdir -p package
         # Amazon Linux 2コンテナで依存関係をビルド
         docker run --rm -v $(pwd):/var/task amazonlinux:2 \
           bash -c "
@@ -37,12 +39,15 @@ jobs:
             yum update -y
             yum install -y python3 python3-pip
             python3 -m pip install --upgrade pip
-            mkdir -p package
             python3 -m pip install -r requirements.txt -t ./package
             echo 'Dependencies installed for Amazon Linux 2'
             ls -la ./package
             du -sh ./package
           "
+        # パッケージディレクトリの存在を確認
+        echo "Package directory contents:"
+        ls -la package/
+        du -sh package/
         
     - name: Create deployment package
       run: |
